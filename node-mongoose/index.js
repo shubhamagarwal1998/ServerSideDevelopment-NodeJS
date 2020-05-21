@@ -7,23 +7,38 @@ const connect = mongoose.connect(url);
 
 connect.then((db) =>{
     console.log('Connected Successfully');
-    var newDish=Dishes({
+    Dishes.create({
         name:'Uthapizza',
         description:'test'
-    });
-    newDish.save()
-        .then((dish)=>{
-            console.log(dish);
-            return Dishes.find({});
+    })
+    .then((dish)=>{
+        console.log(dish);
+        return Dishes.findByIdAndUpdate(dish._id,{
+            $set:{description:'Updated test'}
+        },{
+            new:true
         })
-        .then((dishes) =>{
-            console.log(dishes);
-            return Dishes.remove({})
-        })
-        .then(()=>{
-            return mongoose.connection.close();
-        })
-        .catch((err)=>{
-            console.log(err);
+        .exec();
+    })
+    .then((dish) =>{
+        console.log(dish);
+
+        dish.comments.push({
+            rating:5,
+            comment:'I\'m getting a sinking feeling!',
+            author:'Leonardo di Carpaccio'
         });
+        return dish.save();
+    })
+    .then((dish) =>{
+        console.log(dish);
+
+        return Dishes.remove({});
+    })
+    .then(()=>{
+        return mongoose.connection.close();
+    })
+    .catch((err)=>{
+        console.log(err);
+    });
 })
