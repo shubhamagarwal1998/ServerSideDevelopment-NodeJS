@@ -20,6 +20,7 @@ const Dishes=require('./models/dishes');
 const url='mongodb://localhost:27017/conFusion';
 const connect=mongoose.connect(url);
 
+
 connect.then((db)=>{
   console.log("Connected correctly to server");
 },(err) =>{console.log(err);});
@@ -33,6 +34,15 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.all('*',(req,res,next)=>{
+  if(req.secure){
+    return next();
+  }
+  else{
+    res.redirect(307,'https://'+req.hostname+':'+app.get('secPort')+req.url);
+  }
+});
+
 //app.use(cookieParser('12345-67890-09876-54321'));
 
 // app.use(session({
